@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bunzilla | Fresh & Fierce Burgers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange-primary: #FF5F00;
+            --red-zilla: #D41414;
+            --dark-bg: #0D0D0D;
+        }
+        h1, h2, h3, .brand-font {
+            font-family: 'Bangers', cursive;
+            letter-spacing: 1px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            scroll-behavior: smooth;
+        }
+        .orange-glow:hover {
+            box-shadow: 0 0 20px rgba(255, 95, 0, 0.5);
+        }
+        .cart-open { transform: translateX(0) !important; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="sticky top-0 z-50 bg-[#0D0D0D] border-b border-orange-600/20 px-6 py-4 flex justify-between items-center">
+        <div class="text-4xl text-orange-500 brand-font tracking-tighter">BUNZILLA</div>
+        
+        <button onclick="toggleCart()" class="relative bg-orange-600 p-2.5 rounded-full hover:bg-orange-500 transition-all orange-glow">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <span id="cart-count" class="absolute -top-1 -right-1 bg-white text-black text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center">0</span>
+        </button>
+    </header>
+
+    <section class="py-20 px-6 text-center">
+        <h1 class="text-7xl md:text-9xl mb-4 text-orange-500 drop-shadow-2xl">BUNZILLA</h1>
+        <p class="text-red-500 font-bold tracking-widest uppercase mb-8">Red-Hot Flavors • Dark Site Vibes</p>
+        <a href="#menu" class="bg-white text-black px-10 py-4 rounded-full font-black uppercase tracking-tighter hover:bg-orange-500 transition-all">Order Below</a>
+    </section>
+
+    <main id="menu" class="py-12 px-6 max-w-6xl mx-auto">
+        <h2 class="text-4xl brand-font text-orange-500 mb-8 border-l-4 border-red-600 pl-4">The Feed</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-[#141414] p-6 rounded-3xl border border-gray-900 flex justify-between items-center">
+                <div>
+                    <h3 class="text-2xl brand-font tracking-wide">Zilla Classic</h3>
+                    <p class="text-gray-500 text-sm mb-4">Beef patty, house sauce, pickles.</p>
+                    <span class="text-xl font-black text-orange-500">Rs. 750</span>
+                </div>
+                <button onclick="addToCart('Zilla Classic', 750)" class="bg-orange-600 p-4 rounded-2xl font-bold hover:bg-red-600 transition-all">Add +</button>
+            </div>
+            <div class="bg-[#141414] p-6 rounded-3xl border border-gray-900 flex justify-between items-center">
+                <div>
+                    <h3 class="text-2xl brand-font tracking-wide">Spicy Kaiju</h3>
+                    <p class="text-gray-500 text-sm mb-4">Hot chicken, slaw, ghost pepper.</p>
+                    <span class="text-xl font-black text-orange-500">Rs. 950</span>
+                </div>
+                <button onclick="addToCart('Spicy Kaiju', 950)" class="bg-orange-600 p-4 rounded-2xl font-bold hover:bg-red-600 transition-all">Add +</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="cart-sidebar" class="fixed right-0 top-0 h-full w-full md:w-[400px] bg-[#0A0A0A] shadow-2xl transform translate-x-full transition-transform duration-300 z-[60] p-8 flex flex-col border-l border-orange-600">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-4xl brand-font text-orange-500 italic">Your Bag</h2>
+            <button onclick="toggleCart()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+        </div>
+        
+        <div id="cart-items" class="flex-grow overflow-y-auto space-y-4">
+            </div>
+
+        <div class="mt-8 pt-8 border-t border-gray-800">
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-gray-400 font-bold uppercase tracking-widest">Total</span>
+                <span id="cart-total" class="text-3xl font-black text-white">Rs. 0</span>
+            </div>
+            <button onclick="sendToWhatsApp()" class="w-full bg-[#25D366] text-black py-5 rounded-2xl font-black uppercase tracking-widest hover:brightness-110 transition-all flex justify-center items-center gap-3">
+                Send to wa.me
+            </button>
+        </div>
+    </div>
+
+    <footer class="bg-black py-12 px-6 border-t border-gray-900 mt-auto text-center">
+        <div class="brand-font text-3xl text-orange-600 mb-2">BUNZILLA</div>
+        <p class="text-gray-600">Contact: 03043532300</p>
+    </footer>
+
+    <script>
+        let cart = [];
+        const PHONE_NUMBER = "923043532300"; // Country code + your number
+
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('cart-open');
+        }
+
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateUI();
+            if(cart.length === 1) toggleCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateUI();
+        }
+
+        function updateUI() {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = cart.length === 0 ? '<p class="text-gray-600 text-center">Cart is empty</p>' : '';
+            
+            let total = 0;
+            cart.forEach((item, i) => {
+                total += item.price;
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-[#111] p-4 rounded-xl border border-gray-800">
+                        <div>
+                            <p class="font-bold">${item.name}</p>
+                            <p class="text-orange-500">Rs. ${item.price}</p>
+                        </div>
+                        <button onclick="removeFromCart(${i})" class="text-red-600">&times;</button>
+                    </div>`;
+            });
+            document.getElementById('cart-total').innerText = `Rs. ${total}`;
+            document.getElementById('cart-count').innerText = cart.length;
+        }
+
+        function sendToWhatsApp() {
+            if (cart.length === 0) return alert("Empty cart!");
+
+            let text = "*BUNZILLA ORDER*%0A------------------%0A";
+            cart.forEach((item, i) => {
+                text += `${i+1}. ${item.name} (Rs. ${item.price})%0A`;
+            });
+            const total = cart.reduce((s, i) => s + i.price, 0);
+            text += `------------------%0A*Total: Rs. ${total}*`;
+
+            // Using direct wa.me link construction
+            const waLink = "https://wa.me/" + PHONE_NUMBER + "?text=" + text;
+            
+            // This is the most compatible way to bypass "Blocked by response" errors
+            const win = window.open(waLink, '_blank');
+            if (win) {
+                win.focus();
+            } else {
+                window.location.href = waLink; // Fallback if popup is blocked
+            }
+        }
+    </script>
+</body>
+</html>
